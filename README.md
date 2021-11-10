@@ -6,7 +6,7 @@ The KnitR package has generated html and Pdf reports that are included with this
 
 The following files (3 types) are included in the upload:
 
-- **MovieLens.rmd** - this file
+- **MovieLens.rmd** - the markdown for the report
 - **MovieLens.R** - Main R code for the project
 - **ProjGivenCode.R** - The given R code for the project
 - **MovieLensSummaryReport.pdf** - Main summary report containing analysis

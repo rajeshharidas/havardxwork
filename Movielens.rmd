@@ -2,14 +2,15 @@
 title: "MovieLens Rating Recommendation"
 author: "Rajesh Haridas"
 date: "November 15, 2021"
-header-includes:
-   - \DeclareUnicodeCharacter{2212}{-}
-   - \DeclareUnicodeCharacter{21A9}{-}
-   - \DeclareUnicodeCharacter{FE0E}{-}
-   - \usepackage{placeins}
 output:
   pdf_document: default
   html_document: default
+  word_document: default
+header-includes:
+- \DeclareUnicodeCharacter{2212}{-}
+- \DeclareUnicodeCharacter{21A9}{-}
+- \DeclareUnicodeCharacter{FE0E}{-}
+- \usepackage{placeins}
 ---
 
 ```{r setup, include=FALSE}
@@ -48,6 +49,9 @@ The following files (3 types) are included in the upload:
 - **ProjGivenCode.R** - The given R code for the project
 - **MovieLensSummaryReport.pdf** - Main summary report containing analysis
 - **MovieLensExecutionReport.pdf** - Main execution report containing output of the runs
+
+\tableofcontents
+\listoffigures
 
 ## Introduction to MovieLens rating recommendation
 
@@ -162,7 +166,14 @@ img_path <- "images/sparsematrix.png"
 knitr::include_graphics(img_path)
 ```
 
-This machine learning challenge is complicated because each outcome Y has a different set of predictors. Users rate movies. Each movie is rated by multiple users. Not every movie is rated by every user. Some movies are rated more frequently. Some users rate more movies than others. Some users have different temperaments than others. Some users are more active than others at rating movies. Some genres are rated more frequently than others. The lowest rating is 0.5. All movies were rated. There are no NAs. Here is the movie and users distribution
+This machine learning challenge is complicated because each outcome Y has a different set of predictors. Users rate movies. Each movie is rated by multiple users. Not every movie is rated by every user. Some movies are rated more frequently. Some movies were rated only once. Some users rate more movies than others. Some users have different temperaments than others. Some users are more active than others at rating movies. Some genres are rated more frequently than others. The lowest rating is 0.5. 4 is the most common rating, followed 3 and 5. Half rating are less common than whole star ratings. All movies were rated. There are no NAs. Here is the movie and users distribution where n is the number of ratings.
+
+```{r,echo=FALSE, fig.cap ="Ratings distribution"}
+library(ggplot2)  # For plotting
+library(png) 
+img_path <- "images/ratingdist.jpg"
+knitr::include_graphics(img_path)
+```
 
 ```{r,echo=FALSE,fig.width=60, fig.cap ="Movies distribution"}
 library(ggplot2)  # For plotting
@@ -209,7 +220,7 @@ The code (ProjGivenCode.R) that is provided in the project downloads the latest 
 
 In order to compute predictions and RMSE, this development dataset is further split 90/10 into training and test sets respectively. Cleaning of the dataset removes NAs and ensure that the data is in tidy form. To make sure we don’t include users and movies in the test set that do not appear in the training set, we remove these entries using the semi_join function. After we create train and test sets, we remove the removed, and temp intermediate data to save space.
 
-### Analysis
+### Model Creation
 
 The plain model that uses same rating for all movies regardless of the user would be best described with this formula
 
@@ -242,6 +253,8 @@ where \(\mu\) is the observed mean rating. The RMSE for this plain model would b
 ```
 
 Our goal is to reduce this RMSE to less than 0.86490. Hence we further analyze the impact of other predictors on the rating.
+
+#### Using movie as a predictor
 
 We now add the predictor movie to the formula as there is great deal of variability in ratings for each movie. We will investigate how the movie itself impacts the rating. Some movies are better that others. Some are box-office hits while others are not.
 
@@ -294,6 +307,8 @@ We can see this improves our prediction ratings.
 
 We can now improve on this rating by adding additional predictor user.
 
+#### Using movie and user as predictors
+
 We could again use lm like this:
 
 ```{r}
@@ -326,6 +341,9 @@ The RMSE (Residual Mean Square Error) is the error made in prediction and is def
 
 where N is the number of user/movie combinations and the sum occurring over all these combinations and, $y_{u,i}$ is the rating for movie i by user u and the prediction is \(\mathit{\hat{y}_{u,i}}\).
 
+The effect of each error on RMSE is proportional to the size of the squared error;thus larger errors have disproportionately large effect on RMSE. Consequently, RMSE is sensitive to outliers.
+
+We now run the predictions for movie and user.
 
 ```{r}
 # b_u_hat <- train_set %>% 
@@ -357,58 +375,15 @@ where N is the number of user/movie combinations and the sum occurring over all 
 
 We can see that the ratings are already meeting out 0.86490 RMSE goal. However, we do see there is considerable noise when we look at the rating of best and worst movies. In many cases only 1 user rated some movies. Uncertainty in ratings increase with fewer users rating the movie.
 
-```{r}
 
-#|title                                                          |       b_i|  n|
-
-#|:--------------------------------------------------------------|---------:|--:|
-
-#|Hellhounds on My Trail (1999)                                  | 0.2587094|  1|
-
-#|Shadows of Forgotten Ancestors (1964)                          | 0.2587094|  1|
-
-#|Fighting Elegy (Kenka erejii) (1966)                           | 0.2587094|  1|
-
-#|Sun Alley (Sonnenallee) (1999)                                 | 0.2587094|  1|
-
-#|Maradona by Kusturica (2008)                                   | 0.2587094|  1|
-
-#|Blue Light, The (Das Blaue Licht) (1932)                       | 0.2587094|  1|
-
-#|Mickey (2003)                                                  | 0.1717529|  1|
-
-#|Demon Lover Diary (1980)                                       | 0.1717529|  1|
-
-#|Valerie and Her Week of Wonders (Valerie a tÃ½den divu) (1970) | 0.1717529|  1|
-
-#|Testament of Orpheus, The (Testament d'OrphÃ©e) (1960)         | 0.1717529|  1|
-
-
-#|title                                                                         |        b_i|  n|
-
-#|:-----------------------------------------------------------------------------|----------:|--:|
-
-#|Hi-Line, The (1999)                                                           | -0.5238993|  1|
-
-#|Grief (1993)                                                                  | -0.5238993|  1|
-
-#|Accused (Anklaget) (2005)                                                     | -0.5238993|  1|
-
-#|Confessions of a Superhero (2007)                                             | -0.5238993|  1|
-
-#|Dog Run (1996)                                                                | -0.4369427|  1|
-
-#|Monkey's Tale, A (Les ChÃ¢teau des singes) (1999)                             | -0.4369427|  1|
-
-#|When Time Ran Out... (a.k.a. The Day the World Ended) (1980)                  | -0.4369427|  1|
-
-#|Dischord (2001)                                                               | -0.4369427|  1|
-
-#|Last Minute, The (2001)                                                       | -0.4369427|  1|
-
-#|Relative Strangers (2006)                                                     | -0.4369427|  1|
-
+```{r,echo=FALSE, fig.retina = 2, fig.cap ="Obscure ratings"}
+library(ggplot2)  # For plotting
+library(png) 
+img_path <- "images/Rplot.png"
+knitr::include_graphics(img_path)
 ```
+
+#### Regularization
 
 Regularization allows us to reduce the noise by penalizing large estimates that are formed using small sample sizes.
 

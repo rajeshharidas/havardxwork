@@ -25,7 +25,7 @@ test_set <- temp %>%
 
 removed <- anti_join(temp, test_set)
 
-train <- rbind(train_set, removed)
+train_set <- rbind(train_set, removed) #add back removed items
 
 #remove temporary data to save space
 rm(removed, temp) 

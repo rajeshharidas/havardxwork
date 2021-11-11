@@ -239,7 +239,7 @@ The plain model that uses same rating for all movies regardless of the user woul
 
 ```
 
-where \(\mu\) is the observed mean rating. The RMSE for this plain model would be
+where \(\mu\) is the observed mean rating. The RMSE for this plain model would be 1.059358
 
 
 ```{r}
@@ -254,8 +254,8 @@ where \(\mu\) is the observed mean rating. The RMSE for this plain model would b
 
 Our goal is to reduce this RMSE to less than 0.86490. Hence we further analyze the impact of other predictors on the rating.
 
-#### Using movie as a predictor
-
+#### Using movie as a predictor  \
+\
 We now add the predictor movie to the formula as there is great deal of variability in ratings for each movie. We will investigate how the movie itself impacts the rating. Some movies are better that others. Some are box-office hits while others are not.
 
 We can again use least squares to estimate the bi in the following way,
@@ -289,7 +289,7 @@ The prediction rating for movie can be defined as:
 
 where \(\mu\) is the least square estimate and the term \({b}_{i}\) represents average ranking for movie \({i}\). 
 
-We can see this improves our prediction ratings.
+We can see this improves our prediction rating to 0.943281
 
 ```{r}
 # predicted_ratings <- mu_hat + test_set %>% 
@@ -307,8 +307,8 @@ We can see this improves our prediction ratings.
 
 We can now improve on this rating by adding additional predictor user.
 
-#### Using movie and user as predictors
-
+#### Using movie and user as predictors  \
+\
 We could again use lm like this:
 
 ```{r}
@@ -373,7 +373,7 @@ We now run the predictions for movie and user.
 # [1] 0.8647667
 ```
 
-We can see that the ratings are already meeting out 0.86490 RMSE goal. However, we do see there is considerable noise when we look at the rating of best and worst movies. In many cases only 1 user rated some movies. Uncertainty in ratings increase with fewer users rating the movie.
+We can see that the rating 0.8647667 is already meeting our 0.86490 RMSE goal. However, we do see there is considerable noise when we look at the rating of best and worst movies. In many cases only 1 user rated some movies. Uncertainty in ratings increase with fewer users rating the movie.
 
 
 ```{r,echo=FALSE, fig.retina = 2, fig.cap ="Obscure ratings"}
@@ -383,8 +383,8 @@ img_path <- "images/Rplot.png"
 knitr::include_graphics(img_path)
 ```
 
-#### Regularization
-
+#### Regularization  \
+\
 Regularization allows us to reduce the noise by penalizing large estimates that are formed using small sample sizes.
 
 The first step in regularization is to choose a penalty term. We do this by calculating user and movie averages with a lambda constant from a sequence of lambda and then calculating RMSEs for each of the chosen lambda. The lowest lambda is then used as the penalty term.

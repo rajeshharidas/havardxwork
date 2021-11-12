@@ -15,6 +15,7 @@ header-includes:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE,warning = FALSE, message = FALSE, tidy = TRUE, tidy.opts = list(comment = TRUE))
+# hooks to keep figures and text in order without floats
 knitr::knit_hooks$set(plot = function (x, options) {
   float_correct <- function(f, y, opts)  {
     if (is.null(opts$regfloat) || opts$regfloat==FALSE)
@@ -36,15 +37,15 @@ knitr::knit_hooks$set(plot = function (x, options) {
 
 ## Preface
 
-This document and the associated code is based on the Capstone course of the HarvardX Professional Certificate in Data Science (PH125.9x) course work and additional reading material provided in the course work.This applies the knowledge procured during the course.
+This document and the associated code is based on the Capstone HarvardX Professional Certificate in Data Science (PH125.9x) course work and additional reading material provided in the course.
 
 My project work on the ratings and RMSE computation for the MovieLens system is included in this and dependent files. This file references **MovieLens.R** and the given code is included in ProjGivenCode.R.
 
-The KnitR package has generated html and Pdf reports that are included with this rmd file
+The KnitR package has generated html and pdf reports that are included with this rmd file
 
 The following files (3 types) are included in the upload:
 
-- **MovieLens.rmd** - this file
+- **MovieLens.rmd** - Markdown for the main summary report file
 - **MovieLens.R** - Main R code for the project
 - **ProjGivenCode.R** - The given R code for the project
 - **MovieLensSummaryReport.pdf** - Main summary report containing analysis
@@ -53,7 +54,7 @@ The following files (3 types) are included in the upload:
 \tableofcontents
 \listoffigures
 
-## Introduction to MovieLens rating recommendation
+# Introduction to MovieLens rating recommendation
 
 MovieLens dataset was created by the GroupLens project. The GroupLens Research Project is a research group in the Department of Computer Science and Engineering at the University of Minnesota. According to the summary of the dataset, it contains 10000054 ratings and 95580 tags applied to 10681 movies by 71567 users of the online movie recommendation service MovieLens. More information can be found at https://files.grouplens.org/datasets/movielens/ml-10m-README.html. 
 
@@ -92,7 +93,7 @@ Due to the size of the dataset, most of the caret package functions for train an
 
 The validation data set is not used for training, and developing. It is only used for evaluating the RMSE of the final algorithm.
 
-## Analysis
+# Analysis
 
 ### Data Exploration
 
@@ -168,7 +169,7 @@ knitr::include_graphics(img_path)
 
 This machine learning challenge is complicated because each outcome Y has a different set of predictors. Users rate movies. Each movie is rated by multiple users. Not every movie is rated by every user. Some movies are rated more frequently. Some movies were rated only once. Some users rate more movies than others. Some users have different temperaments than others. Some users are more active than others at rating movies. Some genres are rated more frequently than others. The lowest rating is 0.5. 4 is the most common rating, followed 3 and 5. Half rating are less common than whole star ratings. All movies were rated. There are no NAs. Here is the movie and users distribution where n is the number of ratings.
 
-```{r,echo=FALSE, fig.cap ="Ratings distribution"}
+```{r,echo=FALSE, fig.retina = 2, fig.cap ="Ratings distribution"}
 library(ggplot2)  # For plotting
 library(png) 
 img_path <- "images/ratingdist.jpg"
@@ -212,11 +213,13 @@ img_path <- "images/b_u_var.png"
 knitr::include_graphics(img_path)
 ```
 
+This indicates that we will need to take into account the bias and penalty due to variability and work towards a solution with lower RMSE. Lets see how we can achieve this.
+
 \newpage
 
 ### Process
 
-The code (ProjGivenCode.R) that is provided in the project downloads the latest ratings and movie dataset (The data are contained in files, movies.dat, and ratings.dat) from grouplens and keeps only those titles which have at least 1 rating. It then splits the original dataset into development and validation datasets. All analysis is done this development dataset
+The code (ProjGivenCode.R) that is provided in the project downloads the latest ratings and movie dataset (The data are contained in files, movies.dat, and ratings.dat) from grouplens and keeps only those titles which have at least 1 rating. It then splits the original dataset into development and validation datasets. All analysis is done on this development dataset
 
 In order to compute predictions and RMSE, this development dataset is further split 90/10 into training and test sets respectively. Cleaning of the dataset removes NAs and ensure that the data is in tidy form. To make sure we don’t include users and movies in the test set that do not appear in the training set, we remove these entries using the semi_join function. After we create train and test sets, we remove the removed, and temp intermediate data to save space.
 
@@ -324,7 +327,7 @@ The prediction rating for movie and user can be defined as:
   \mu + {b}_{i} + {b}_{u} + \epsilon_{u,i}
 \]
 
-where \(\mu\) is the least square estimate and the term \({b}_{i}\) represents average ranking for movie \({i}\) and \({b}_{u}\) represents the average ranking by users. The bias \(\hat{b}_{..}\) is also calculated using the least squared estimates.
+where the term \({b}_{i}\) represents average ranking for movie \({i}\) and \({b}_{u}\) represents the average ranking by users. The bias \(\hat{b}_{..}\) is also calculated using the least squared estimates.
 
 The bias \(\hat{b}_{i}\) is calculated using the average of \({y}_{u,i} - \hat\mu\) for each \({i}\), where \({i}\) is the movie.
 
@@ -480,9 +483,7 @@ We then use this to compute the regularized ratings and RMSE
 
 This prevents obscure movies and improves the RMSE to 0.86466.
 
-\newpage
-
-## Results
+# Results
 
 ```{r echo=FALSE, warning=FALSE, regfloat=FALSE}
 library(tidyverse)
@@ -502,7 +503,7 @@ To summarize the approach is to work on a smaller training set, compute the leas
 
 Above is the tabulated summary of all the RMSEs for the different methods.
 
-## Conclusion
+# Conclusion
 
 The MovieLens dataset is very long, so we train models using average approximation of least square and processed within the available RAM in personal machine. To improve precision, we would need to use knn, glm, lm or such training algorithms from caret package.
 
@@ -510,7 +511,7 @@ The ratings in the MovieLens dataset have a varying degree of variability by gen
 
 However, I was able to use least square estimates algorithm to predict the ratings based on movie and user variability within the requested RMSE parameters. The RMSE improved further with regularization. The **final RMSE 0.86466** is below our target RMSE 0.86499
 
-There are additional biases like movie age that can been explored to further improve the accuracy of the model. Additionally, methods such as matrix factorization using the recosystem package could be utilized to provide significant improvements in the RMSE. More advanced models featuring principal component analysis (PCA) and Singular Value Decomposition (SVD) generate higher levels of accuracy, though they are also far more computationally intensive
+There are additional predictors like movie age that can been explored to further improve the accuracy of the model. Additionally, methods such as matrix factorization using the recosystem package could be utilized to provide significant improvements in the RMSE. More advanced models featuring principal component analysis (PCA) and Singular Value Decomposition (SVD) generate higher levels of accuracy, though they are also far more computationally intensive
 
 ### Appendix A - Complete code
 

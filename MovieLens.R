@@ -15,7 +15,7 @@ test_index <- createDataPartition(y = edx$rating, times = 1, p = 0.1,
                                   list = FALSE)
 train_set <- edx[-test_index,]
 
-# create a test set to assess the accuracy of the models implemented during development.*
+# create a test set to assess the accuracy of the models implemented during development.
 temp <- edx[test_index,]
 
 # Exclude users and movies in the test set that do not appear in the training set using the semi_join
@@ -42,12 +42,15 @@ mu_hat <- mean(train_set$rating)
 
 naive_rmse <- RMSE(test_set$rating,mu_hat)
 
+# RMSE for plain model with same rating for all movies
+naive_rmse
+
 # the least squares estimate b_i_hat is just the average of mean of rating - avg. rating  
 b_i_hat <- train_set %>% 
   group_by(movieId) %>% 
   summarize(b_i = mean(rating - mu_hat))
 
-# quick plot to review least square estimates
+# quick plot to review least square estimates for movie bias
 movie_plot <- b_i_hat %>% qplot(b_i, geom ="histogram", bins = 10, data = ., color = I("black"))
 
 # Calculate the predicted ratings and RMSE for just the movieid
@@ -63,7 +66,7 @@ b_u_hat <- train_set %>%
   group_by(userId) %>%
   summarize(b_u = mean(rating - mu_hat - b_i))
 
-# quick plot to review least square estimates
+# quick plot to review least square estimates for user bias
 user_plot <- b_u_hat %>% qplot(b_u, geom ="histogram", bins = 10, data = ., color = I("black"))
 
 #review the two bias effect in a side-by-side plot
@@ -82,7 +85,7 @@ rmse_movie_user <- RMSE(predicted_ratings_w_user, test_set$rating)
 # Choosing the penalty term (lambda)
 lambdas <- seq(0, 10, 0.25)
 
-
+# iterate through the sequence of lambdas and compute the ratings and RMSEs
 rmses <- sapply(lambdas, function(l){
   
   mu_hat <- mean(train_set$rating)
@@ -109,7 +112,9 @@ rmses <- sapply(lambdas, function(l){
 # verify the lambda penalty term
 qplot(lambdas, rmses)
 
+# find the lambda with the lowest RMSE
 lambda <- lambdas[which.min(rmses)]
+
 #optimal lambda
 lambda
 
@@ -145,7 +150,7 @@ validation_ratings_regularized <- validation_test_set %>%
   mutate(pred = mu_hat + b_i  + b_u) %>%
   pull(pred)
 
-# compute the RMSE on the validation set
+# compute the RMSE for the validation set
 rmse_validation_test <- RMSE(validation_ratings_regularized,validation_test_set$rating)
 
 # tabulate all the RMSE results
@@ -160,4 +165,5 @@ rmse_results <- matrix( c("Just the movie", round(rmse_movie,6),
 
 
                            
-rmse_results %>% knitr::kable() %>%  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+rmse_results %>% knitr::kable() %>%  
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))

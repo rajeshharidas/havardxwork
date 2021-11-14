@@ -84,7 +84,7 @@ The **goal** of this capstone exercise is to compute the predicted ratings and R
 The **outcome** is rating and the **predictors** are movie and user identified by the movieId and userId respectively. RMSE and predictions are calculated for the following scenarios
 
 - predicted rating and RMSE with just the movie as the predictor
-- predicted rating and RMSE with movie stratified by user
+- predicted rating and RMSE with movie and user
 - regularized rating prediction and RMSE for user and movie
 
 RMSE is used to evaluate how close the predictions are to the true values in the validation set. All RMSEs are tabulated in the results section of this report. The details on how the results were arrived at are also in a subsection.
@@ -481,7 +481,7 @@ We then use this to compute the regularized ratings and RMSE
 #rmse_movie_user_regularized <- RMSE(predicted_ratings_regularized, #test_set$rating)
 ```
 
-This prevents obscure movies and improves the RMSE to 0.86466.
+This prevents obscure movies and improves the RMSE to 0.86464. The last step is to validate the results with the validation set. This gives us a final rating of 0.86466 that matches with our results. Goal achieved!
 
 # Results
 
